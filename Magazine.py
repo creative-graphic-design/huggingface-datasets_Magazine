@@ -170,7 +170,7 @@ class MagazineDataset(ds.GeneratorBasedBuilder):
                 "elements": ds.Sequence(
                     {
                         "label": ds.Value("string"),
-                        "polygon_x": ds.Sequence("int64"),
+                        "polygon_x": ds.Sequence(ds.Value("int64")),
                         "polygon_y": ds.Sequence(ds.Value("int64")),
                     }
                 ),
