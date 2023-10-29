@@ -26,6 +26,10 @@ _URLS = {
 }
 
 
+class MagazineException(Exception):
+    pass
+
+
 @dataclass
 class LayoutSize(object):
     width: int
@@ -52,11 +56,6 @@ class LayoutElement(object):
     def from_dict(cls, json_dict: JsonDict) -> "LayoutElement":
         json_dict = cls.parse_polygons(json_dict)
         return cls(**json_dict)
-
-
-def get_annotation_from_xml(xml_file: pathlib.Path) -> ET.Element:
-    tree = ET.parse(xml_file)
-    return tree.getroot()
 
 
 def get_filename(annotation: ET.Element) -> str:
@@ -121,9 +120,15 @@ class LayoutAnnotation(object):
     images: List[PilImage]
 
     @classmethod
-    def from_xml_annotation(
-        cls, annotation: ET.Element, image_base_dir: pathlib.Path
+    def get_annotation_from_xml(cls, xml_file: pathlib.Path) -> ET.Element:
+        tree = ET.parse(xml_file)
+        return tree.getroot()
+
+    @classmethod
+    def from_xml(
+        cls, xml_file: pathlib.Path, image_base_dir: pathlib.Path
     ) -> "LayoutAnnotation":
+        annotation = cls.get_annotation_from_xml(xml_file)
         filename = get_filename(
             annotation=annotation,
         )
@@ -133,9 +138,13 @@ class LayoutAnnotation(object):
         layout_size = get_layout_size(
             annotation=annotation,
         )
-        layout_elements = get_layout_elements(
-            annotation=annotation,
-        )
+        try:
+            layout_elements = get_layout_elements(
+                annotation=annotation,
+            )
+        except ValueError as err:
+            raise MagazineException(f"Invalid xml file: {xml_file}") from err
+
         keywords = get_keywords(
             annotation=annotation,
         )
@@ -210,9 +219,13 @@ class MagazineDataset(ds.GeneratorBasedBuilder):
     ):
         xml_files = [f for f in layout_xml_dir.iterdir() if f.suffix == ".xml"]
         for i, xml_file in enumerate(xml_files):
-            annotation = get_annotation_from_xml(xml_file)
-            layout_annotation = LayoutAnnotation.from_xml_annotation(
-                annotation=annotation,
-                image_base_dir=image_base_dir,
-            )
+            try:
+                layout_annotation = LayoutAnnotation.from_xml(
+                    xml_file=xml_file,
+                    image_base_dir=image_base_dir,
+                )
+            except MagazineException as err:
+                logger.warning(err)
+                continue
+
             yield i, asdict(layout_annotation)
