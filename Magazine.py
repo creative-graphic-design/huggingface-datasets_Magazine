@@ -1,26 +1,72 @@
+import os
 import pathlib
 import xml.etree.ElementTree as ET
 from dataclasses import asdict, dataclass
-from typing import Any, Dict, List
+from typing import Any, Dict, List, TypedDict
+
+from PIL import Image
+from PIL.Image import Image as PilImage
 
 import datasets as ds
 from datasets.utils.logging import get_logger
-from PIL import Image
-from PIL.Image import Image as PilImage
 
 logger = get_logger(__name__)
 
 JsonDict = Dict[str, Any]
 
-_CITATION = ""
+_DESCRIPTION = "A large-scale magazine layout dataset with fine-grained layout annotations and keyword labeling"
 
-_DESCRIPTION = ""
+_CITATION = """\
+@article{zheng2019content,
+  title={Content-aware generative modeling of graphic design layouts},
+  author={Zheng, Xinru and Qiao, Xiaotian and Cao, Ying and Lau, Rynson WH},
+  journal={ACM Transactions on Graphics (TOG)},
+  volume={38},
+  number={4},
+  pages={1--15},
+  year={2019},
+  publisher={ACM New York, NY, USA}
+}
+"""
 
-_HOMEPAGE = ""
+_HOMEPAGE = "https://xtqiao.com/projects/content_aware_layout/"
 
-_LICENSE = ""
+_LICENSE = """\
+Copyright (c) 2019, Xiaotian Qiao
+All rights reserved.
 
-_URLS = {
+This code is copyrighted by the authors and is for non-commercial research
+purposes only.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+"""
+
+
+class URLs(TypedDict):
+    image: str
+    layout: str
+
+
+_URLS: URLs = {
     "image": "https://huggingface.co/datasets/shunk031/Magazine-private/resolve/main/MagImage.zip",
     "layout": "https://huggingface.co/datasets/shunk031/Magazine-private/resolve/main/MagLayout.zip",
 }
@@ -165,13 +211,24 @@ class LayoutAnnotation(object):
 
 class MagazineDataset(ds.GeneratorBasedBuilder):
     VERSION = ds.Version("1.0.0")
-    BUILDER_CONFIGS = [ds.BuilderConfig(version=VERSION)]
+    BUILDER_CONFIGS = [ds.BuilderConfig(version=VERSION, description=_DESCRIPTION)]
+
+    @property
+    def _manual_download_instructions(self) -> str:
+        return (
+            "To use Magazine dataset, you need to download the annotations "
+            "from the OneDrive in the official webpage "
+            "(https://portland-my.sharepoint.com/:f:/g/personal/xqiao6-c_my_cityu_edu_hk/EhmRh5SFoQ9Hjl_aRjCOltkBKFYefiSagR6QLJ7pWvs3Ww?e=y8HO5Q)."
+        )
 
     def _info(self) -> ds.DatasetInfo:
         features = ds.Features(
             {
                 "filename": ds.Value("string"),
-                "category": ds.Value("string"),
+                "category": ds.ClassLabel(
+                    num_classes=6,
+                    names=["fashion", "food", "news", "science", "travel", "wedding"],
+                ),
                 "size": {
                     "width": ds.Value("int64"),
                     "height": ds.Value("int64"),
@@ -195,13 +252,32 @@ class MagazineDataset(ds.GeneratorBasedBuilder):
             features=features,
         )
 
+    def _download_from_hf(self, dl_manager: ds.DownloadManager) -> URLs:
+        return dl_manager.download_and_extract(_URLS)
+
+    def _download_from_local(self, dl_manager: ds.DownloadManager) -> URLs:
+        assert dl_manager.manual_dir is not None, dl_manager.manual_dir
+        dir_path = os.path.expanduser(dl_manager.manual_dir)
+
+        if not os.path.exists(dir_path):
+            raise FileNotFoundError()
+
+        return dl_manager.extract(
+            path_or_paths={
+                "image": os.path.join(dir_path, "MagImage.zip"),
+                "layout": os.path.join(dir_path, "MagLayout.zip"),
+            }
+        )
+
     def _split_generators(self, dl_manager: ds.DownloadManager):
-        file_paths = dl_manager.download_and_extract(_URLS)
+        if dl_manager.download_config.token:
+            file_paths = self._download_from_hf(dl_manager)
+        else:
+            file_paths = self._download_from_local(dl_manager)
 
         layout_xml_dir = (
             pathlib.Path(file_paths["layout"]) / "layoutdata" / "annotations"
         )
-
         image_base_dir = pathlib.Path(file_paths["image"]) / "images"
 
         return [
