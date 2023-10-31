@@ -26,6 +26,8 @@ task_ids: []
 
 # Dataset Card for Magazine dataset
 
+[![CI](https://github.com/shunk031/huggingface-datasets_Magazine/actions/workflows/ci.yaml/badge.svg)](https://github.com/shunk031/huggingface-datasets_Magazine/actions/workflows/ci.yaml)
+
 ## Table of Contents
 - [Dataset Card Creation Guide](#dataset-card-creation-guide)
   - [Table of Contents](#table-of-contents)
