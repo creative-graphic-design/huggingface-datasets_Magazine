@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 import datasets as ds
@@ -8,6 +10,13 @@ def dataset_path() -> str:
     return "Magazine.py"
 
 
+@pytest.mark.skipif(
+    condition=bool(os.environ.get("CI", False)),
+    reason=(
+        "Because this loading script downloads a large dataset, "
+        "we will skip running it on CI."
+    ),
+)
 @pytest.mark.parametrize(
     argnames=("expected_num_dataset",),
     argvalues=((3919,),),
