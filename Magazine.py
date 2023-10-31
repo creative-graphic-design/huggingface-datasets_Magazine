@@ -67,6 +67,9 @@ class URLs(TypedDict):
 
 
 _URLS: URLs = {
+    # The author of this loading script has uploaded the image and layout annotation files to the HuggingFace's private repository to facilitate testing.
+    # If you are using this loading script, please download the annotations from the appropriate channels, such as the OneDrive link provided by the Magazine dataset's author.
+    # (To the author of Magazine dataset, if there are any issues regarding this matter, please contact us. We will address it promptly.)
     "image": "https://huggingface.co/datasets/shunk031/Magazine-private/resolve/main/MagImage.zip",
     "layout": "https://huggingface.co/datasets/shunk031/Magazine-private/resolve/main/MagLayout.zip",
 }
