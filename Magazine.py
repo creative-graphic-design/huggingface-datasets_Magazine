@@ -263,13 +263,24 @@ class MagazineDataset(ds.GeneratorBasedBuilder):
         assert dl_manager.manual_dir is not None, dl_manager.manual_dir
         dir_path = os.path.expanduser(dl_manager.manual_dir)
 
-        if not os.path.exists(dir_path):
-            raise FileNotFoundError()
+        image_zip_path = os.path.join(dir_path, "MagImage.zip")
+        layout_zip_path = os.path.join(dir_path, "MagLayout.zip")
 
+        if (
+            not os.path.exists(dir_path)
+            or not os.path.exists(image_zip_path)
+            or not os.path.exists(layout_zip_path)
+        ):
+            raise FileNotFoundError(
+                "Make sure you have downloaded and placed the `MagImage.zip` and `MagLayout.zip` correctly. "
+                'Furthermore, you should check that a manual dir via `datasets.load_dataset("shunk031/Magazine", data_dir=...)` '
+                "that includes zip files from the downloaded files. "
+                f"Manual downloaded instructions: {self._manual_download_instructions}"
+            )
         return dl_manager.extract(
             path_or_paths={
-                "image": os.path.join(dir_path, "MagImage.zip"),
-                "layout": os.path.join(dir_path, "MagLayout.zip"),
+                "image": image_zip_path,
+                "layout": layout_zip_path,
             }
         )
 
