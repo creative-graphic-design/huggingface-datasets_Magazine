@@ -9,16 +9,10 @@ def dataset_path() -> str:
 
 
 @pytest.mark.parametrize(
-    argnames=("expected_num_dataset", "invalid_samples"),
-    argvalues=((3919, 16),),
+    argnames=("expected_num_dataset",),
+    argvalues=((3919,),),
 )
-def test_load_dataset(
-    dataset_path: str, expected_num_dataset: int, invalid_samples: int
-):
-    dataset = ds.load_dataset(
-        path=dataset_path,
-        # token=True,
-        data_dir="./datasets",
-    )
+def test_load_dataset(dataset_path: str, expected_num_dataset: int):
+    dataset = ds.load_dataset(path=dataset_path, token=True)
 
-    assert dataset["train"].num_rows + invalid_samples == expected_num_dataset
+    assert dataset["train"].num_rows == expected_num_dataset

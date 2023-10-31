@@ -72,10 +72,6 @@ _URLS: URLs = {
 }
 
 
-class MagazineException(Exception):
-    pass
-
-
 @dataclass
 class LayoutSize(object):
     width: int
@@ -89,8 +85,8 @@ class LayoutElement(object):
     polygon_y: List[int]
 
     @classmethod
-    def parse_polygon(cls, polygon_str: str) -> List[int]:
-        return list(map(lambda x: int(x), polygon_str.split()))
+    def parse_polygon(cls, polygon_str: str) -> List[float]:
+        return list(map(lambda x: float(x), polygon_str.split()))
 
     @classmethod
     def parse_polygons(cls, json_dict: JsonDict) -> JsonDict:
@@ -184,13 +180,9 @@ class LayoutAnnotation(object):
         layout_size = get_layout_size(
             annotation=annotation,
         )
-        try:
-            layout_elements = get_layout_elements(
-                annotation=annotation,
-            )
-        except ValueError as err:
-            raise MagazineException(f"Invalid xml file: {xml_file}") from err
-
+        layout_elements = get_layout_elements(
+            annotation=annotation,
+        )
         keywords = get_keywords(
             annotation=annotation,
         )
@@ -235,9 +227,18 @@ class MagazineDataset(ds.GeneratorBasedBuilder):
                 },
                 "elements": ds.Sequence(
                     {
-                        "label": ds.Value("string"),
-                        "polygon_x": ds.Sequence(ds.Value("int64")),
-                        "polygon_y": ds.Sequence(ds.Value("int64")),
+                        "label": ds.ClassLabel(
+                            num_classes=5,
+                            names=[
+                                "text",
+                                "image",
+                                "headline",
+                                "text-over-image",
+                                "headline-over-image",
+                            ],
+                        ),
+                        "polygon_x": ds.Sequence(ds.Value("float32")),
+                        "polygon_y": ds.Sequence(ds.Value("float32")),
                     }
                 ),
                 "keywords": ds.Sequence(ds.Value("string")),
@@ -295,13 +296,8 @@ class MagazineDataset(ds.GeneratorBasedBuilder):
     ):
         xml_files = [f for f in layout_xml_dir.iterdir() if f.suffix == ".xml"]
         for i, xml_file in enumerate(xml_files):
-            try:
-                layout_annotation = LayoutAnnotation.from_xml(
-                    xml_file=xml_file,
-                    image_base_dir=image_base_dir,
-                )
-            except MagazineException as err:
-                logger.warning(err)
-                continue
-
+            layout_annotation = LayoutAnnotation.from_xml(
+                xml_file=xml_file,
+                image_base_dir=image_base_dir,
+            )
             yield i, asdict(layout_annotation)
