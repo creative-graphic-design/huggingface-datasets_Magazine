@@ -285,11 +285,11 @@ class MagazineDataset(ds.GeneratorBasedBuilder):
         )
 
     def _split_generators(self, dl_manager: ds.DownloadManager):
-        if dl_manager.download_config.token:
-            file_paths = self._download_from_hf(dl_manager)
-        else:
-            file_paths = self._download_from_local(dl_manager)
-
+        file_paths = (
+            self._download_from_hf(dl_manager)
+            if dl_manager.download_config.token
+            else self._download_from_local(dl_manager)
+        )
         layout_xml_dir = (
             pathlib.Path(file_paths["layout"]) / "layoutdata" / "annotations"
         )
