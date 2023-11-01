@@ -80,7 +80,7 @@ A large-scale magazine layout dataset with fine-grained layout annotations and k
 
 ### Data Instances
 
-To use Magazine dataset, you need to download the image and layout annotations from the [OneDrive](https://portland-my.sharepoint.com/:f:/g/personal/xqiao6-c_my_cityu_edu_hk/EhmRh5SFoQ9Hjl_aRjCOltkBKFYefiSagR6QLJ7pWvs3Ww?e=y8HO5Q) in the official page. 
+To use Magazine dataset, you need to download the image and layout annotations from the [OneDrive](https://portland-my.sharepoint.com/:f:/g/personal/xqiao6-c_my_cityu_edu_hk/EhmRh5SFoQ9Hjl_aRjCOltkBKFYefiSagR6QLJ7pWvs3Ww?e=y8HO5Q) in the [official page](https://xtqiao.com/projects/content_aware_layout/).
 Then place the downloaded files in the following structure and specify its path.
 
 ```shell
@@ -181,4 +181,4 @@ dataset = ds.load_dataset(
 
 ### Contributions
 
-Thanks to [Xinru Zheng and Xiaotian Qiao*](https://xtqiao.com/projects/content_aware_layout/) for creating this dataset.
+Thanks to [Xinru Zheng and Xiaotian Qiao](https://xtqiao.com/projects/content_aware_layout/) for creating this dataset.
