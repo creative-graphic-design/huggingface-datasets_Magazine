@@ -4,11 +4,10 @@ import xml.etree.ElementTree as ET
 from dataclasses import asdict, dataclass
 from typing import Any, Dict, List, TypedDict
 
-from PIL import Image
-from PIL.Image import Image as PilImage
-
 import datasets as ds
 from datasets.utils.logging import get_logger
+from PIL import Image
+from PIL.Image import Image as PilImage
 
 logger = get_logger(__name__)
 
@@ -105,13 +104,13 @@ class LayoutElement(object):
 
 def get_filename(annotation: ET.Element) -> str:
     filename = annotation.find("filename")
-    assert filename is not None
+    assert filename is not None and filename.text is not None
     return filename.text
 
 
 def get_layout_category(annotation: ET.Element) -> str:
     elem = annotation.find("category")
-    assert elem is not None
+    assert elem is not None and elem.text is not None
     return elem.text
 
 
@@ -120,10 +119,10 @@ def get_layout_size(annotation: ET.Element) -> LayoutSize:
     assert size is not None
 
     h_elem = size.find("height")
-    assert h_elem is not None
+    assert h_elem is not None and h_elem.text is not None
 
     w_elem = size.find("width")
-    assert w_elem is not None
+    assert w_elem is not None and w_elem.text is not None
 
     return LayoutSize(width=int(w_elem.text), height=int(h_elem.text))
 
@@ -141,7 +140,7 @@ def get_keywords(annotation: ET.Element) -> List[str]:
     texts = annotation.find("text")
     assert texts is not None
     keywords = texts.findall("keyword")
-    return [keyword.text for keyword in keywords]
+    return [keyword.text for keyword in keywords]  # type: ignore
 
 
 def load_image(file_path: pathlib.Path) -> PilImage:
