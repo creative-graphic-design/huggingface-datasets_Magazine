@@ -80,7 +80,7 @@ A large-scale magazine layout dataset with fine-grained layout annotations and k
 
 ### Data Instances
 
-To use Magazine dataset, you need to download the image and layout annotations from the [OneDrive](https://portland-my.sharepoint.com/:f:/g/personal/xqiao6-c_my_cityu_edu_hk/EhmRh5SFoQ9Hjl_aRjCOltkBKFYefiSagR6QLJ7pWvs3Ww?e=y8HO5Q) in the [official page](https://xtqiao.com/projects/content_aware_layout/).
+<!-- To use Magazine dataset, you need to download the image and layout annotations from the [OneDrive](https://portland-my.sharepoint.com/:f:/g/personal/xqiao6-c_my_cityu_edu_hk/EhmRh5SFoQ9Hjl_aRjCOltkBKFYefiSagR6QLJ7pWvs3Ww?e=y8HO5Q) in the [official page](https://xtqiao.com/projects/content_aware_layout/).
 Then place the downloaded files in the following structure and specify its path.
 
 ```shell
@@ -96,6 +96,12 @@ dataset = ds.load_dataset(
     path="shunk031/Magazine",
     data_dir="/path/to/datasets/", # Specify the path of the downloaded directory.
 )
+``` -->
+
+```python
+import datasets as ds
+
+dataset = ds.load_dataset("creative-graphic-design/Magazine")
 ```
 
 ### Data Fields
@@ -162,7 +168,34 @@ dataset = ds.load_dataset(
 
 ### Licensing Information
 
-[More Information Needed]
+```
+Copyright (c) 2019, Xiaotian Qiao
+All rights reserved.
+
+This code is copyrighted by the authors and is for non-commercial research
+purposes only.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
 
 ### Citation Information
 
